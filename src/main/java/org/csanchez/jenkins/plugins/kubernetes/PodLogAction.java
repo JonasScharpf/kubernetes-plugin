@@ -2,21 +2,20 @@ package org.csanchez.jenkins.plugins.kubernetes;
 
 import hudson.Extension;
 import hudson.model.Action;
-import hudson.model.Computer;
 import java.util.Collection;
 import java.util.List;
 import jenkins.model.Jenkins;
 import jenkins.model.TransientActionFactory;
 import org.jspecify.annotations.NonNull;
 
-public class PodLogAction implements Action {
-    private final Computer owner;
+public final class PodLogAction implements Action {
+    private final KubernetesComputer owner;
 
-    public PodLogAction(Computer owner) {
+    private PodLogAction(KubernetesComputer owner) {
         this.owner = owner;
     }
 
-    public Computer getOwner() {
+    public KubernetesComputer getOwner() {
         return owner;
     }
 
@@ -36,15 +35,20 @@ public class PodLogAction implements Action {
     }
 
     @Extension
-    public static final class PodLogActionFactory extends TransientActionFactory<Computer> {
+    public static final class PodLogActionFactory extends TransientActionFactory<KubernetesComputer> {
 
         @Override
-        public Class<Computer> type() {
-            return Computer.class;
+        public Class<KubernetesComputer> type() {
+            return KubernetesComputer.class;
         }
 
         @Override
-        public @NonNull Collection<? extends Action> createFor(@NonNull Computer target) {
+        public Class<? extends Action> actionType() {
+            return PodLogAction.class;
+        }
+
+        @Override
+        public @NonNull Collection<? extends Action> createFor(@NonNull KubernetesComputer target) {
             if (!Jenkins.get().hasPermission(Jenkins.MANAGE)) {
                 return List.of();
             }
